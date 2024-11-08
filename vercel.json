@@ -1,10 +1,4 @@
 {
-    "builds": [
-        {
-            "src": "src/main.jsx",
-            "use": "@vercel/node"
-        }
-    ],
     "routes": [
         {
             "src": "/[^.]+",
