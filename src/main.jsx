@@ -11,5 +11,5 @@ createRoot(document.getElementById('root')).render(
     <Web3Provider>
       <RouterProvider router={router} />
     </Web3Provider>
-  </StrictMode>,
+  </StrictMode>
 )
