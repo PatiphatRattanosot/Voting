@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useWeb3 } from '../useContexts/Web3Context';
-import TopCandidates from '../components/TopCandidates'; // Import the new TopCandidates component
+import Swal from 'sweetalert2';
+import TopCandidates from '../components/TopCandidates';
 
 const VotingApp = () => {
-    const { contract, isActive,  votingState } = useWeb3();
+    const { contract, provider, isActive, votingState } = useWeb3();
 
     const [candidates, setCandidates] = useState([]);
     const [votes, setVotes] = useState({});
@@ -36,16 +37,56 @@ const VotingApp = () => {
     const handleVote = async (candidate) => {
         if (!hasVoted) {
             try {
-                const tx = await contract.voteForCandidate(candidate);
-                await tx.wait();
+                const loadingSwal = Swal.fire({
+                    title: 'กำลังดำเนินการ...',
+                    text: 'โปรดรอสักครู่ ขณะกำลังลงคะแนน',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                });
+                Swal.showLoading();
 
-                alert(`คุณได้ลงคะแนนให้ ${candidate} แล้ว!`);
+                const tx = await contract.voteForCandidate(candidate);
+
+                provider.once(tx.hash, (receipt) => {
+                    loadingSwal.close();
+                    if (receipt && receipt.status === 1) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'โหวตสำเร็จ!',
+                            text: `คุณได้ลงคะแนนให้ ${candidate} แล้ว!`,
+                            confirmButtonText: 'ตกลง',
+                        });
+                        setHasVoted(true);
+                        setVotes((prevVotes) => ({
+                            ...prevVotes,
+                            [candidate]: prevVotes[candidate] + 1,
+                        }));
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: 'ไม่สามารถบันทึกการโหวตได้',
+                            confirmButtonText: 'ตกลง',
+                        });
+                    }
+                });
             } catch (error) {
                 console.error(error);
-                alert('เกิดข้อผิดพลาดในการลงคะแนน');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'เกิดข้อผิดพลาดในการลงคะแนน',
+                    confirmButtonText: 'ตกลง',
+                });
             }
         } else {
-            alert('คุณได้ลงคะแนนแล้ว');
+            Swal.fire({
+                icon: 'warning',
+                title: 'คุณได้ลงคะแนนแล้ว',
+                text: 'ไม่สามารถลงคะแนนได้อีก',
+                confirmButtonText: 'ตกลง',
+            });
         }
     };
 
@@ -58,7 +99,6 @@ const VotingApp = () => {
                     </div>
                 ) : (
                     <>
-                        {/* ตรวจสอบสถานะการโหวต */}
                         {votingState === 'Created' && (
                             <div className="text-lg text-gray-600 text-center p-4 bg-yellow-100 rounded-lg shadow-md">
                                 ระบบยังไม่เปิดให้โหวต
@@ -99,8 +139,6 @@ const VotingApp = () => {
                                 <div className="text-lg text-center p-4 bg-gray-200 rounded-lg shadow-md text-gray-700">
                                     การโหวตสิ้นสุดแล้ว
                                 </div>
-
-                                {/* Display the top 3 candidates */}
                                 <TopCandidates contract={contract} />
                             </div>
                         )}

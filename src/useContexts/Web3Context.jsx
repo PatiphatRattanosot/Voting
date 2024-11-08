@@ -50,7 +50,7 @@ export const Web3Provider = ({ children }) => {
                             stateText = 'Unknown';
                     }
 
-                    setVotingState(stateText); // เก็บค่าที่แปลงแล้วใน votingState
+                    setVotingState(stateText); 
                 } catch (err) {
                     console.error("Error fetching voting state:", err);
                 }
@@ -71,7 +71,7 @@ export const Web3Provider = ({ children }) => {
 
     const connectMetaMask = async () => {
         try {
-            await metaMask.connectEagerly(); // หรือการเชื่อมต่อ MetaMask แบบ eager
+            await metaMask.connectEagerly(); 
             console.debug('Successfully connected to MetaMask');
         } catch (error) {
             console.debug('Failed to connect eagerly to MetaMask');
