@@ -10,9 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ethersproject/units": "^5.7.0",
+    "@web3-react/core": "^8.2.3",
+    "@web3-react/metamask": "^8.2.4",
+    "bufferutil": "^4.0.8",
+    "ethers": "^6.13.4",
+    "eventemitter3": "^5.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
